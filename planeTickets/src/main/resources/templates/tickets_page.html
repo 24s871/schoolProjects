@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Tickets page</title>
+</head>
+<style>
+    body
+    {
+      /*background: url(https://images.pexels.com/photos/1103970/pexels-photo-1103970.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2) no-repeat;*/
+       background: url(https://images.pexels.com/photos/249581/pexels-photo-249581.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2) no-repeat;
+    }
+    h2
+    {
+        font-family: "Arial Rounded MT Bold",sans-serif;
+        font-size: large;
+    }
+    table, th, td {
+        border: 3px solid black;
+        border-collapse: collapse;
+    }
+</style>
+<body>
+<h1>WELCOME <span th:text="${userLogin}"></span></h1>
+<h3>YOUR ID IS <span th:text="${id}"></span></h3>
+<div>
+    <form action="#" th:action="@{/tickets}" th:object="${information}" method="post" >
+        <label for="textInput1">Departure:</label>
+        <input type="text" id="textInput1" name="Departure" th:field="*{departure}"><br>
+
+        <label for="textInput2">Arrival:</label>
+        <input type="text" id="textInput2" name="Arrival" th:field="*{arrival}"><br>
+
+        <label for="textInput3">Date of departure:</label>
+        <input type="text" id="textInput3" name="Date of departure" th:field="*{dateDeparture}"><br>
+
+        <label for="textInput6">Class:</label>
+        <input type="text" id="textInput6" name="Class" th:field="*{clasa}"><br>
+
+        <label for="textInput5">Passengers:</label>
+        <input type="text" id="textInput5" name="Passengers" th:field="*{passangers}"><br>
+
+        <label><input type="text" th:field="*{direct}"> Direct</label>
+        <label><input type="text" th:field="*{stopover}"> 1 Stopover</label><br>
+
+        <label for="duration">The maximum duration of the trip:</label>
+        <input type="text" id="duration" name="duration" th:field="*{duration}"><br>
+
+        <label for="luggage">Number of checked baggage:</label>
+        <input type="text" id="luggage" name="luggage" th:field="*{numberOfLuggages}"><br>
+
+        <label for="airline">Select airline</label>
+        <input type="text" id="airline" name="airline" th:field="*{airline}"><br>
+
+        <label for="transit airport">Transit airport</label>
+        <input type="text" id="transit airport" name="transit airport" th:field="*{transit}"><br>
+
+
+        <button type="submit" >Search</button><br>
+
+        <br>
+    </form>
+    <div class="container">
+        <div class="row col-md-10">
+            <h2>List of available plane tickets</h2>
+        </div>
+        <table class="table table-bordered table-hover" >
+            <thead class="table-dark">
+            <tr>
+                <th>Id</th>
+                <th>Company</th>
+                <th>Departure city</th>
+                <th>Departure airport</th>
+                <th>Departure date</th>
+                <th>Departure hour</th>
+                <th>Arrival city</th>
+                <th>Arrival airport</th>
+                <th>Arrival date</th>
+                <th>Arrival hour</th>
+                <th>economy price</th>
+                <th> first class price</th>
+                <th>second class price</th>
+                <th>business class price</th>
+                <th>stopover</th>
+                <th>flight time</th>
+                <th>luggage price</th>
+                <th>final price</th>
+                <th>data for buying</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each = "t : ${tickets}">
+                <td th:text="${t.id}"></td>
+                <td th:text = "${t.company}"></td>
+                <td th:text="${t.departureCity}"></td>
+                <td th:text="${t.departureAirport}"></td>
+                <td th:text="${t.departureDate}"></td>
+                <td th:text="${t.departureHour}"></td>
+                <td th:text="${t.arrivalCity}"></td>
+                <td th:text="${t.arrivalAirport}"></td>
+                <td th:text="${t.arrivalDate}"></td>
+                <td th:text="${t.arrivalHour}"></td>
+                <td th:text="${t.economicPrice}"></td>
+                <td th:text="${t.firstPrice}"></td>
+                <td th:text="${t.secondPrice}"></td>
+                <td th:text="${t.bussinessPrice}"></td>
+                <td th:text="${t.stopoverCity}"></td>
+                <td th:text="${t.flightTime}"></td>
+                <td th:text="${t.checkBaggagePrice}"></td>
+                <td th:text="${t.finalPrice}"></td>
+                <td><a href="/payment">navigate to payment</a></td>
+
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+</body>
+</html>

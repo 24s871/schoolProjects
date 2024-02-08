@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Users</title>
+    <style>
+        table, th, td {
+            border: 3px solid black;
+            border-collapse: collapse;
+        }
+        body
+        {
+            background: blanchedalmond;
+        }
+    </style>
+</head>
+<body>
+<div>
+<div>
+<table class="table table-bordered table-hover" style="width:70%">
+    <thead class="table-dark">
+    <tr>
+        <th>Id</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Password</th>
+        <th>Role</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each = "t : ${users}">
+        <td th:text="${t.id}"></td>
+        <td th:text = "${t.name}"></td>
+        <td th:text="${t.email}"></td>
+        <td th:text="${t.password}"></td>
+        <td th:text="${t.role}"></td>
+
+    </tr>
+    </tbody>
+</table>
+    <form  action="#" th:action="@{/admin_users}" th:object="${k}" method="post">
+        <label for="id">id</label>
+        <input type="text" id="id" name="id" th:field="*{id}"><br>
+
+        <label for="id1">name</label>
+        <input type="text" id="id1" name="id" th:field="*{name}"><br>
+
+        <label for="id3">email</label>
+        <input type="text" id="id3" name="id" th:field="*{email}"><br>
+
+        <label for="id5">password</label>
+        <input type="text" id="id5" name="id" th:field="*{password}"><br>
+
+        <label for="id6">role</label>
+        <input type="text" id="id6" name="id" th:field="*{role}"><br>
+
+        <label for="id7">action(write edit for edit,nothing for delete)</label>
+        <input type="text" id="id7" name="id" th:field="*{action}"><br>
+        <button type="submit" >Submit</button>
+    </form>
+</div>
+</div>
+</body>
+</html>
