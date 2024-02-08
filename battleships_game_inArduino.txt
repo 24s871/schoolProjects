@@ -1,0 +1,163 @@
+#include <LiquidCrystal.h>
+LiquidCrystal lcd(7, 6, 5, 4, 3, 2);
+int coloana=0,linie=0;
+int bReset;
+int bMoveRight;
+int bMoveLeft;
+int bMoveUp;
+int bMoveDown;
+int bPress;
+int numberTriesDone=0;
+int numberTries=4;
+int numberShips=3;
+int numberShipsDiscovered=0;
+int col1,line1,col2,line2,col3,line3;
+//matrice 4x2, lcd (0,0) (1,0) (2,0) (3,0)
+//                 (0,1) (1,1) (2,1) (3,1)
+int game[2][4]={{0,0,0,0},{0,0,0,0}};
+void setup() {
+  // put your setup code here, to run once:
+  pinMode(0, INPUT_PULLUP);  //reset  
+  pinMode(1, INPUT_PULLUP);   //press  
+  pinMode(8, INPUT_PULLUP);   //right
+  pinMode(9,INPUT_PULLUP);    //left
+  pinMode(10,INPUT_PULLUP);    //up
+  pinMode(11,INPUT_PULLUP);  //down
+  lcd.begin(16,2);//coloana,linie
+  //Serial.begin(9600);
+  //ships position
+  col1=(int)random(0,4);
+  line1=(int)random(0,2);
+  col2=(int)random(0,4);
+  line2=(int)random(0,2);
+  col3=(int)random(0,4);
+  line3=(int)random(0,2);
+  //game[line1][col1]=1;
+  //game[line2][col2]=1;
+  //game[line3][col3]=1;
+  game[0][0]=1;
+  game[0][1]=1;
+  game[0][2]=1;
+}
+ 
+void loop() {
+  // put your main code here, to run repeatedly:
+ 
+   bReset=digitalRead(0);
+   bPress=digitalRead(1);
+   bMoveRight=digitalRead(8);
+   bMoveLeft=digitalRead(9);
+   bMoveUp=digitalRead(10);
+   bMoveDown=digitalRead(11);
+   checkWin();
+   lcd.setCursor(coloana,linie);
+   lcd.blink();
+   if (bMoveRight==0)
+   {   //lcd.clear();
+    coloana++;
+    delay(500);
+    //Serial.print("bMoveRight ");
+    //Serial.println(bMoveRight);
+    //lcd.setCursor(7, 0);
+    //lcd.print(coloana);
+    if(coloana==4)
+    {
+      coloana=0;
+    }
+    //lcd.setCursor(7, 1);
+    //lcd.print(coloana);
+   }
+   if(bMoveLeft==0)
+   {
+    coloana--;
+    //Serial.println(bMoveLeft);
+    delay(500);
+    if(coloana==-1)
+    {
+      coloana=3;
+    }
+   }
+   //Serial.println(bMoveLeft);
+   if(bMoveUp==0)
+   {
+    linie--;
+    delay(500);
+    if(linie==-1)
+    {
+      linie=1;
+    }
+   }
+   if (bMoveDown==0)
+   {
+   linie++;
+   delay(500);
+   if(linie==2)
+   {
+    linie=0;
+   }
+   }
+   if(bPress==0)
+   {
+    int val=game[linie][coloana];
+    delay(500);
+    lcd.print(val);
+    numberTriesDone++;
+    if(game[linie][coloana]==1)
+    {
+      numberShipsDiscovered++;
+    }
+    //lcd.clear();
+      lcd.setCursor(7, 0);
+      lcd.print(numberShipsDiscovered);
+      lcd.setCursor(7, 1);
+      lcd.print(numberTriesDone);
+   }
+ 
+   if(bReset==0)
+   {
+    for(int i=0;i<2;i++)
+    {
+      for(int j=0;j<4;j++)
+      {
+        game[i][j]=0;
+      }
+    }
+  col1=(int)random(0,4);
+  line1=(int)random(0,2);
+  col2=(int)random(0,4);
+  line2=(int)random(0,2);
+  col3=(int)random(0,4);
+  line3=(int)random(0,2);
+  game[line1][col1]=1;
+  game[line2][col2]=1;
+  game[line3][col3]=1;
+  coloana=0;
+  linie=0;
+  numberTriesDone=0;
+  numberShipsDiscovered=0;
+  lcd.clear();
+  lcd.setCursor(6, 0);
+  lcd.print("Game reset");
+  delay(300);
+  lcd.clear();
+   }
+}
+ 
+void checkWin()
+{
+  if(numberTriesDone<=numberTries+1 && numberShips==numberShipsDiscovered)
+  {
+    lcd.clear();
+    lcd.setCursor(7,0);
+    lcd.print("WIN");
+    delay(50);
+  }
+  else if(numberTriesDone==numberTries && numberShips>numberShipsDiscovered)
+  {
+    lcd.clear();
+    lcd.setCursor(7,0);
+    lcd.print("GAME OVER");
+    delay(50);
+  }
+ 
+}
