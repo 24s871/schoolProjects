@@ -12,7 +12,7 @@ public class ConnectDataBase {
     private static final String DRIVER = "com.mysql.cj.jdbc.Driver";
     private static final String DBURL = "jdbc:mysql://localhost:3306/schooldb";
     private static final String USER = "root";
-    private static final String PASS = "DragonFire*0";
+    private static final String PASS = "root";
 
     private static ConnectDataBase singleInstance = new ConnectDataBase();
 
