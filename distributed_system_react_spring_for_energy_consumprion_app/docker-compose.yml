@@ -1,0 +1,199 @@
+version: '3'
+
+services:
+  # Container pentru MySQL - Utilizator
+  mysql_utilizator:
+    image: mysql:latest
+    container_name: mysql_utilizator
+    environment:
+      MYSQL_ROOT_PASSWORD: "DragonFire*0"
+      MYSQL_DATABASE: "Utilizator"
+    ports:
+      - "3308:3306"
+    volumes:
+      - ~/mysql/Utilizator_data:/var/lib/mysql
+    networks:
+      - my_network
+    restart: always
+
+  # Container pentru MySQL - Dispozitive
+  mysql_dispozitive:
+    image: mysql:latest
+    container_name: mysql_dispozitive
+    environment:
+      MYSQL_ROOT_PASSWORD: "DragonFire*0"
+      MYSQL_DATABASE: "Dispozitive"
+    ports:
+      - "3307:3306"
+    volumes:
+      - ~/mysql/Dispozitive_data:/var/lib/mysql
+    networks:
+      - my_network
+    restart: always
+
+  #Container pentru MySQL-Monitor
+  mysql_monitor:
+    image: mysql:latest
+    container_name: mysql_monitor
+    environment:
+      MYSQL_ROOT_PASSWORD: "DragonFire*0"
+      MYSQL_DATABASE: "Monitor"
+    ports:
+      - "3309:3306"
+    volumes:
+      - ~/mysql/Monitor_data:/var/lib/mysql
+    networks:
+      - my_network
+    restart: always
+
+   # Container pentru MySQL - Chat
+  mysql_chat:
+    image: mysql:latest
+    container_name: mysql_chat
+    environment:
+      MYSQL_ROOT_PASSWORD: "DragonFire*0"
+      MYSQL_DATABASE: "Chat"
+    ports:
+      - "3310:3306"
+    volumes:
+      - ~/mysql/Chat_data:/var/lib/mysql
+    networks:
+      - my_network
+    restart: always
+  
+  reverse-proxy:
+    image: "traefik:v3.2"
+    command:
+      #- "--log.level=DEBUG"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entryPoints.web.address=:80"
+    ports:
+      - "80:80"
+      - "8080:8080"
+    depends_on:
+      - frontend-app
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      -  "traefik_logs:/var/log/traefik"
+    networks:
+      - my_network
+    
+
+  # Aplicatia Spring Boot - utilizator-app
+  utilizatorapp:
+    build:
+      context: ./backend_user
+      dockerfile: Dockerfile
+    depends_on:
+      - mysql_utilizator
+    deploy:
+      replicas: 2
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql_utilizator:3306/Utilizator
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: DragonFire*0
+    networks:
+      - my_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.utilizatorapp.rule=Host(`utilizatorapp.localhost`) || PathPrefix(`/utilizatorapp`)"
+      - "traefik.http.middlewares.utilizatorapp-strip.stripprefix.prefixes=/utilizatorapp"
+      - "traefik.http.routers.utilizatorapp.middlewares=utilizatorapp-strip "
+      - "traefik.http.services.utilizatorapp.loadbalancer.server.port=8083"
+
+  # Aplicatia Spring Boot - dispozitive-app
+  dispozitiveapp:
+    build:
+      context: ./backend_device
+      dockerfile: Dockerfile
+    depends_on:
+      - mysql_dispozitive
+    deploy:
+      replicas: 2
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql_dispozitive:3306/Dispozitive
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: DragonFire*0
+    networks:
+      - my_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dispozitiveapp.rule=Host(`dispozitiveapp.localhost`) || PathPrefix(`/dispozitiveapp`)"
+      - "traefik.http.middlewares.dispozitiveapp-strip.stripprefix.prefixes=/dispozitiveapp"
+      - "traefik.http.routers.dispozitiveapp.middlewares=dispozitiveapp-strip "
+      - "traefik.http.services.dispozitiveapp.loadbalancer.server.port=8081"
+
+  # Aplicatia Spring Boot - communication-app
+  monitorapp:
+    build:
+      context: ./monitoring_communication
+      dockerfile: Dockerfile
+    container_name: monitorapp
+    depends_on:
+      - mysql_monitor
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql_monitor:3306/Monitor
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: DragonFire*0
+    networks:
+      - my_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.monitorapp.rule=Host(`monitorapp.localhost`) || PathPrefix(`/monitorapp`)"
+      - "traefik.http.middlewares.monitorapp-strip.stripprefix.prefixes=/monitorapp"
+      - "traefik.http.routers.monitorapp.middlewares=monitorapp-strip "
+      - "traefik.http.services.monitorapp.loadbalancer.server.port=8082"
+  
+  # Aplicatia Spring Boot - chat-app
+  chatapp:
+    build:
+      context: ./chat
+      dockerfile: Dockerfile
+    container_name: chatapp
+    depends_on:
+      - mysql_chat
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql_chat:3306/Chat
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: DragonFire*0
+    networks:
+      - my_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.chatapp.rule=Host(`chatapp.localhost`) || PathPrefix(`/chatapp`)"
+      - "traefik.http.middlewares.chatapp-strip.stripprefix.prefixes=/chatapp"
+      - "traefik.http.routers.chatapp.middlewares=chatapp-strip "
+      - "traefik.http.services.chatapp.loadbalancer.server.port=8084"
+
+  # Aplicatia React - frontend-app
+  frontend-app:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend-app
+    ports:
+      - "3000:3000"
+    depends_on:
+      - utilizatorapp
+      - dispozitiveapp
+      - monitorapp
+      - chatapp
+    environment:
+      REACT_APP_USER_API_URL: "http://utilizator-app:8083"
+      REACT_APP_DEVICE_API_URL: "http://dispozitive-app:8081"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend-app.rule=Host(`localhost`)"
+      - "traefik.http.services.frontend-app.loadbalancer.server.port=3000"
+    networks:
+      - my_network
+
+networks:
+  my_network:
+    driver: bridge
+
+volumes:
+  traefik_logs:  # Definim volumul pentru loguri
+
