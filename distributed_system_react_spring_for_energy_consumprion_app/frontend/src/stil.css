@@ -1,0 +1,48 @@
+.app {
+    background-image: linear-gradient(to left, whitesmoke, #61dafb);
+    min-height: 100vh; /* Înlocuiește height: 1000vh pentru a ocupa înălțimea viewport-ului */
+    display: flex;
+    flex-direction: column;
+}
+
+.table {
+    border: 1px solid black;
+    text-align: center;
+    padding: 10px;
+    width: 100%;
+    border-collapse: collapse; /* Adaugă pentru a elimina spațiile între celule */
+}
+
+.td {
+    text-align: center;
+    padding: 10px; /* Înlocuiește height: 130% cu padding pentru o mai bună distribuție a spațiului */
+    border: 1px solid #ddd; /* Adaugă borduri pentru celule */
+}
+
+.pixie {
+    position: fixed; /* Schimbă din absolute în fixed pentru a rămâne vizibil la scroll */
+    top: 20px; /* Ajustează poziția */
+    left: 20px;
+    background-color: #007bff; /* Culoare albastru mai plăcută */
+    color: white;
+    border: none; /* Elimină border-color */
+    padding: 12px 24px;
+    border-radius: 5px;
+    font-size: 16px;
+    text-align: center;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    cursor: pointer; /* Adaugă cursor pointer pentru a indica că este un buton */
+    transition: background-color 0.3s; /* Adaugă tranziție pentru hover effect */
+}
+
+.pixie:hover {
+    background-color: #0056b3; /* Culoare mai închisă la hover */
+}
+
+.con {
+    flex: 1; /* Permite containerului să ocupe spațiul disponibil */
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
